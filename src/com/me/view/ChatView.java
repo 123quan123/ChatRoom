@@ -189,8 +189,15 @@ public class ChatView<E> implements IView, INetLisener {
 				}
 
 				try {
-					String targetId = jtf.getText().trim();
+					String targetId = jtf.getText().trim().replace("@", "");
+					if (targetId == null) {
+						ViewTool.showMessage(jfrmChat, "请选择要发送的人");
+						return;
+					}
 					byte[] imgStr = selectFile();
+                    if (imgStr.length == 0) {
+                        ViewTool.showMessage(jfrmChat, "读取数据失败");
+                    }
 					client.sendPicture(userModel.getId(), targetId + "@" + imgStr.length);
 					FileSection fileSection = new FileSection((long) imgStr.length);
 					fileSection.setValue(imgStr);
@@ -247,7 +254,6 @@ public class ChatView<E> implements IView, INetLisener {
 	}
 	
 	public void exitView() {
-		System.out.println("jfrmChat.dispose();");
 		jfrmChat.dispose();
 	}
 

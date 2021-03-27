@@ -178,8 +178,9 @@ public class ServerConversation extends Communication {
 	
 	@Override
 	protected void dealNetMessage(NetMessage message) {
-		System.out.println(message.toString());
 		DealNetMessage.dealCommand(this, message);
 	}
 
 }
+
+

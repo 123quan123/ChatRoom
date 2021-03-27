@@ -27,7 +27,6 @@ public class ClientConnectToServerView implements IView {
 	public ClientConnectToServerView() {
 		this.count = 1;
 		client = new Client();
-		System.out.println(client.toString());
 		initView();
 	}
 	

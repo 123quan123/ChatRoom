@@ -47,13 +47,12 @@ public class ClientConversation extends Communication {
 		NetMessage para = new NetMessage()
 				.setCommand(ENetCommand.REGISTRY)
 				.setPara(userModel);
-		System.out.println("registry : " + para);
 		send(para);
 	}
 
 	void sendPicture(String resourceId, String targetId) {
 		send(new NetMessage().setCommand(ENetCommand.SEND_PIC)
-				.setAction(resourceId + "@" + targetId));	
+				.setAction(resourceId + "@" + targetId));
 	}
 
 	public void sendPicInfo(String resourceId, String targetId, String decrypt) {
@@ -156,7 +155,6 @@ public class ClientConversation extends Communication {
 	}
 	@Override
 	protected void dealNetMessage(NetMessage message) {
-		System.out.println(message);
 		DealNetMessage.dealCommand(this, message);
 	}
 
