@@ -55,12 +55,17 @@ public class ClientConversation extends Communication {
 				.setAction(resourceId + "@" + targetId));
 	}
 
-	public void sendPicInfo(String resourceId, String targetId, String decrypt) {
+	void sendPicInfo(String resourceId, String targetId, String decrypt) {
 		send(new NetMessage().setCommand(ENetCommand.SEND_PIC_INFO)
 				.setAction(resourceId + "@" + targetId)
 				.setPara(decrypt));
 	}
-	
+
+	void confirmAcceptPic(String resourceId, String targetId) {
+		send(new NetMessage().setCommand(ENetCommand.CONFIRM_ACCEPT_PIC)
+				.setAction(resourceId + "@" + targetId));
+	}
+
 	void offline() {
 		// 向服务器发送“下线”告知，并停止侦听线程
 		send(new NetMessage()
@@ -153,10 +158,15 @@ public class ClientConversation extends Communication {
 	public void dealNotOnline(NetMessage message) {
 		client.getClientAction().notOnline(message.getAction());
 	}
+	//confirmAcceptPic
+	public void dealConfirmAcceptPic(NetMessage message) {
+		String[] split = message.getAction().split("@");
+		client.getClientAction().confirmAcceptPic(split[0]);
+	}
+
 	@Override
 	protected void dealNetMessage(NetMessage message) {
 		DealNetMessage.dealCommand(this, message);
 	}
-
 
 }

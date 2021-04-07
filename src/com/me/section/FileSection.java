@@ -3,6 +3,9 @@ package com.me.section;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * 图片的section分片
+ */
 public class FileSection {	
 	private List<SectionInfo> sectionInfoList;
 	private byte[] value;

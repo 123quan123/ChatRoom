@@ -95,5 +95,4 @@ public abstract class Communication implements Runnable {
 			this.socket = null;
 		}
 	}
-
 }

@@ -49,12 +49,11 @@ public class Client {
 	}
 	
 	public void offline() {
-		if (clientAction.confirmOffline() == false) {
-			return;
+		if (clientAction.confirmOffline()) {
+			clientAction.beforeOffline();
+			conversation.offline();
+			clientAction.afterOffline();
 		}
-		clientAction.beforeOffline();
-		conversation.offline();
-		clientAction.afterOffline();
 	}
 	
 	public void toOne(String resourceId, String targetId, String message) {
@@ -77,6 +76,10 @@ public class Client {
 	
 	public void sendPicture(String resourceId, String targetId) {
 		conversation.sendPicture(resourceId, targetId);
+	}
+
+	public void confirmAcceptPic(String resourceId, String targetId) {
+		conversation.confirmAcceptPic(resourceId, targetId);
 	}
 	
 	public void sendPicInfo(String resourceId, String targetId, String decrypt) {

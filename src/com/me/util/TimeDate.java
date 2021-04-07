@@ -40,5 +40,17 @@ package com.me.util;
 			
 			return result;
 		}
+
+		public static long getNowTime() {
+			return System.currentTimeMillis();
+		}
+
+		public static float getExc(long startTime, long endTime) {
+			float excTime=(float)(endTime-startTime)/1000;
+			return excTime;
+		}
+
+		public static void main(String[] args) {
+		}
 	}
 

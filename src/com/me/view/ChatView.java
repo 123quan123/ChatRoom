@@ -71,6 +71,9 @@ public class ChatView<E> implements IView, INetLisener {
 	private JScrollPane jspUser;
 	private JList<UserModel> jList;
 
+	byte[] imgStr = null;
+	float time = 0.0f;
+
 	public ChatView(Client client) {
 		this.client = client;
 		userMap = new HashMap<String, String>();
@@ -79,15 +82,12 @@ public class ChatView<E> implements IView, INetLisener {
 		initView();
 	}
 	
-	public static void main(String[] args) {
-		new ChatView(new Client()).showView();
-	}
-	
 	@Override
 	public void init() {
 		jfrmChat = new JFrame("聊天系统-chatroom");
 		jfrmChat.setMinimumSize(new Dimension(840, 560));
 		jfrmChat.setLocationRelativeTo(null);
+		jfrmChat.setResizable(false);
 		jfrmChat.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		jfrmChat.setLayout(new BorderLayout());
 		jList = new JList<UserModel>();
@@ -137,10 +137,15 @@ public class ChatView<E> implements IView, INetLisener {
 				try {
 					String msg = jtf.getText();
 					String[] charArray = msg.split("@");
-					String targetId = charArray[0];					
+					String targetId = charArray[0];
+					long start = TimeDate.getNowTime();
 					String encrypt = AESUtil.encrypt(charArray[1], client.getUserModel().getAesKey());
-					
+					long end = TimeDate.getNowTime();
+					float exc = TimeDate.getExc(start, end);
+					System.out.println("encrypt time :" + exc);
 					client.toOne(userModel.getId(), targetId, encrypt);
+					long currentTime = TimeDate.getNowTime();
+					System.out.println("To one start time :" + currentTime);
 
 					jtatChatRecord.append(TimeDate.getCurrentTime() + "\n "
 							+ "  我向" + targetId + "说  ： " + charArray[1] + "\n");
@@ -148,7 +153,7 @@ public class ChatView<E> implements IView, INetLisener {
 					
 					return;
 				} catch (ArrayIndexOutOfBoundsException e1) {
-					ViewTool.showMessage(jfrmChat, "单发需要加 用户 ID @");
+					ViewTool.showMessage(jfrmChat, "单发需要加 用户 ID @ 消息");
 					return; 
 				} catch (Exception e1) {
 					e1.printStackTrace();
@@ -164,12 +169,17 @@ public class ChatView<E> implements IView, INetLisener {
 					 ViewTool.showMessage(jfrmChat, "没有用户在线"); 
 					 return;
 				}
-
 				try {
 					String msg = jtf.getText();
-
+					long start = TimeDate.getNowTime();
 					String encrypt = AESUtil.encrypt(msg, client.getUserModel().getAesKey());
+					long end = TimeDate.getNowTime();
+					float exc = TimeDate.getExc(start, end);
 					client.toOther(userModel.getId(), encrypt);
+					System.out.println("encrypt time :" + exc);
+					long currentTime = TimeDate.getNowTime();
+					System.out.println("To other start time :" + currentTime);
+
 
 					jtatChatRecord.append(TimeDate.getCurrentTime() + "\n "
 							+ "我向所有人说 : " + msg + "\n ");
@@ -194,21 +204,12 @@ public class ChatView<E> implements IView, INetLisener {
 						ViewTool.showMessage(jfrmChat, "请选择要发送的人");
 						return;
 					}
-					byte[] imgStr = selectFile();
+					imgStr = selectFile();
                     if (imgStr.length == 0) {
                         ViewTool.showMessage(jfrmChat, "读取数据失败");
                     }
 					client.sendPicture(userModel.getId(), targetId + "@" + imgStr.length);
-					FileSection fileSection = new FileSection((long) imgStr.length);
-					fileSection.setValue(imgStr);
-					IResourceAllocationStrtegy allocationStrtegy = new ResourceAllocationStrtegy();
-					allocationStrtegy.allocationSection(fileSection);
-					
-					for (SectionInfo sectionInfo : fileSection.getSectionInfoList()) {
-						String decrypt = AESUtil.encrypt(gson .toJson(sectionInfo)
-								, userModel.getAesKey());
-						client.sendPicInfo(userModel.getId(), targetId, decrypt);
-					}
+
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -306,9 +307,15 @@ public class ChatView<E> implements IView, INetLisener {
 		@Override
 		public void privateConversation(String resourceId, String message) {
 			try {
+				long start = TimeDate.getNowTime();
+				System.out.println("to one end : " + start);
 
 				String decrypt = AESUtil.decrypt(message, client.getUserModel().getAesKey());
-				
+
+				long end = TimeDate.getNowTime();
+				float exc = TimeDate.getExc(start, end);
+				System.out.println("decrypt time :" + exc);
+
 				jtatChatRecord.append(TimeDate.getCurrentTime() + "\n " + resourceId + " : " + decrypt + "\n");
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -318,9 +325,14 @@ public class ChatView<E> implements IView, INetLisener {
 		@Override
 		public void publicConversation(String resourceId, String message) {
 			try {
+				long start = TimeDate.getNowTime();
+				System.out.println("to other end : " + start);
 
 				String decrypt = AESUtil.decrypt(message, client.getUserModel().getAesKey());
-				
+				long end = TimeDate.getNowTime();
+				float exc = TimeDate.getExc(start, end);
+				System.out.println("decrypt time :" + exc);
+
 				jtatChatRecord.append(TimeDate.getCurrentTime() + "\n " + resourceId + " : " + decrypt + "\n");
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -333,13 +345,18 @@ public class ChatView<E> implements IView, INetLisener {
 			int yesOrNo = ViewTool.choiceYesOrNo(jfrmChat, "是否接收来自" + id + "的图片?");
 			
 			if (yesOrNo == JOptionPane.YES_OPTION) {
+				long start = TimeDate.getNowTime();
+
+				System.out.println("pic first receive :" + start);
+
 				if (pictureReceive != null) {
-					ViewTool.showMessage(jfrmChat, "正在接受其他图片，接受失败");
+						ViewTool.showMessage(jfrmChat, "正在接受其他图片，接受失败");
 				} else {
 					long picSize = Long.valueOf(len);
 					UnReceivedFileInfo unReceivedFileInfo = new UnReceivedFileInfo((int) picSize);
 					pictureReceive = new PictureReceive(unReceivedFileInfo);
 				}
+				client.confirmAcceptPic(userModel.getId(), id);
 			} else {
 				if (pictureReceive != null && pictureReceive.getFileWriter() != null) {
 					FileWriter fileWriter = pictureReceive.getFileWriter();
@@ -351,10 +368,40 @@ public class ChatView<E> implements IView, INetLisener {
 		}
 
 		@Override
+		public void confirmAcceptPic(String targetId) {
+			try {
+				FileSection fileSection = new FileSection((long) imgStr.length);
+				fileSection.setValue(imgStr);
+				IResourceAllocationStrtegy allocationStrtegy = new ResourceAllocationStrtegy();
+				allocationStrtegy.allocationSection(fileSection);
+				long start = TimeDate.getNowTime();
+				for (SectionInfo sectionInfo : fileSection.getSectionInfoList()) {
+					String decrypt = null;
+					decrypt = AESUtil.encrypt(gson .toJson(sectionInfo)
+                            , userModel.getAesKey());
+					client.sendPicInfo(userModel.getId(), targetId, decrypt);
+				}
+				long end = TimeDate.getNowTime();
+				float exc = TimeDate.getExc(start, end);
+				System.out.println("encrypt time :" + exc);
+				long currentTime = TimeDate.getNowTime();
+				System.out.println("picture start time :" + currentTime);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		@Override
 		public void receivePicInfo(String resourceId, String picSectionInfo) {
 			try {
+				long start = TimeDate.getNowTime();
+
 				String decrypt = AESUtil.decrypt(picSectionInfo, client.getUserModel().getAesKey());
-				SectionInfo sectionInfo = gson.fromJson(decrypt, SectionInfo.class); 
+
+				long end = TimeDate.getNowTime();
+				time += TimeDate.getExc(start, end);
+
+				SectionInfo sectionInfo = gson.fromJson(decrypt, SectionInfo.class);
 				pictureReceive.getSectionList().add(sectionInfo);
 				pictureReceive.getUnReceivedFileInfo().afterReceiveSection(sectionInfo);
 				boolean complete = pictureReceive.getUnReceivedFileInfo().isComplete();
@@ -363,13 +410,17 @@ public class ChatView<E> implements IView, INetLisener {
 					File file = pictureReceive.setPath(path);
 					FileWriter fileWriter = new FileWriter(file, pictureReceive.getSectionList());
 					fileWriter.start();
-					
+
 					new Thread(new Runnable() {
-						
+
 						@Override
 						public void run() {
 							while(!fileWriter.isOk()) {
 							}
+							long end = TimeDate.getNowTime();
+							System.out.println("pic end :" + end);
+							System.out.println("pic decrypt: " + time);
+							time = 0;
 							ViewTool.showMessage(jfrmChat, "图片存放在" + file.toString());
 							pictureReceive = null;
 						}

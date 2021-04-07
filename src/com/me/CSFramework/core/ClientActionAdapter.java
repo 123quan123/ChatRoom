@@ -40,7 +40,7 @@ public class ClientActionAdapter implements IClientAction {
 
 	@Override
 	public void beGoneByServer() {
-		
+
 	}
 
 	@Override
@@ -91,6 +91,11 @@ public class ClientActionAdapter implements IClientAction {
 	@Override
 	public void notOnline(String id) {
 		
+	}
+
+	@Override
+	public void confirmAcceptPic(String id) {
+
 	}
 
 

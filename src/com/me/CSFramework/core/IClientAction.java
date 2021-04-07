@@ -24,5 +24,6 @@ public interface IClientAction {
 	void receivePicInfo(String string, String para);
 	void refreshList(String onlineList);
 	void notOnline(String id);
-	
+
+	void confirmAcceptPic(String id);
 }

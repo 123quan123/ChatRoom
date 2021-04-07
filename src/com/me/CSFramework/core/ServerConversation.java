@@ -59,6 +59,11 @@ public class ServerConversation extends Communication {
 				.setPara(encrypt));
 	}
 
+	void confirmAcceptPic(String resourceId, String targetId) {
+		send(new NetMessage().setAction(resourceId + "@" + targetId)
+				.setCommand(ENetCommand.CONFIRM_ACCEPT_PIC));
+	}
+
 	void sendOnLineMap(String jsonMapEncrypt) {
 		send(new NetMessage().setCommand(ENetCommand.REFRESH_ONLINE_USER)
 				.setPara(jsonMapEncrypt));
@@ -174,6 +179,11 @@ public class ServerConversation extends Communication {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	//confirmAcceptPic
+	public void dealConfirmAcceptPic(NetMessage message) {
+		String[] split = message.getAction().split("@");
+		server.confirmAcceptPic(split[0], split[1]);
 	}
 	
 	@Override

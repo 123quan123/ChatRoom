@@ -16,6 +16,7 @@ public enum ENetCommand {
 
 	SEND_PIC,
 	SEND_PIC_INFO,
+	CONFIRM_ACCEPT_PIC,
 	
 	OUT_OF_ROOM,
 	OFFLINE,

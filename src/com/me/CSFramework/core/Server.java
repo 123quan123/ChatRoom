@@ -167,6 +167,11 @@ public class Server implements Runnable, INetSpeaker {
 		ServerConversation conversation = conversationList.get(targetId);
 		conversation.sendPicInfo(resourceId, targetId, encrypt);	
 	}
+
+	void confirmAcceptPic(String resourceId, String targetId) {
+		ServerConversation conversation = conversationList.get(targetId);
+		conversation.confirmAcceptPic(resourceId, targetId);
+	}
 	
 	void pushOneToOnlineMap(String id, String name) {
 		onLineUserMap.put(id, name);
@@ -332,8 +337,8 @@ public class Server implements Runnable, INetSpeaker {
 			PropertiesParse.close();
 		}
 	}
-	
-	class ProcessClientConnect implements Runnable {
+
+    class ProcessClientConnect implements Runnable {
 
 		@Override
 		public void run() {
