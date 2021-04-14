@@ -226,7 +226,7 @@ public class Server implements Runnable, INetSpeaker {
 	}
 	
 	
-	void killClient(String id) {
+	public void killClient(String id) {
 		ServerConversation conversation = conversationList.get(id);
 		if (conversation == null) {
 			speakOut("客户端[" + id + "]不存在！");
@@ -239,7 +239,7 @@ public class Server implements Runnable, INetSpeaker {
 		speakOut("客户端[" + id + "]被强制下线！");
 	}
 	
-	public List<String> getOnlineClient() {
+	List<String> getOnlineClient() {
 		List<String> result = new ArrayList<>();
 		
 		synchronized (conversationList) {
@@ -249,6 +249,15 @@ public class Server implements Runnable, INetSpeaker {
 		}
 		
 		return result;
+	}
+
+	public void showClients() {
+		List<String> clientsIDs = getOnlineClient();
+		speakOut("共在线"+ clientsIDs.size() + "人\n");
+		for (int i = 0; i < clientsIDs.size(); i++) {
+			speakOut("用户：" + clientsIDs.get(i) + "  ");
+		}
+		speakOut("\n");
 	}
 	
 	void removeConversation(String id) {

@@ -69,6 +69,13 @@ public class ServerView implements IView, INetLisener{
 				|| command.equalsIgnoreCase("x")
 				|| command.equals("退")) {
 			closeView();
+		} else if (command.startsWith("kill")) {
+			String[] comm = command.split("@");
+			if (comm[1] != null && comm[1].length() == 5) {
+				server.killClient(comm[1]);
+			}
+		} else if (command.startsWith("showClients")) {
+			server.showClients();
 		}
 	}
 
